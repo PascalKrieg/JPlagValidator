@@ -13,7 +13,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.List;
 
-public class MultiCSVSummaryWriter implements IResultWriter{
+public class MultiCSVSummaryWriter implements IResultWriter {
     private final String targetPath;
 
     public MultiCSVSummaryWriter(String targetPath) {
@@ -63,7 +63,7 @@ public class MultiCSVSummaryWriter implements IResultWriter{
     }
 
     private String buildFileName(JarConfig jarConfig, Project project) {
-        return jarConfig.getCommitId().substring(0,6) + "-" + jarConfig.getJarFile().getName()  + "-" + project.getName() + ".csv";
+        return jarConfig.getCommitId().substring(0, 6) + "-" + jarConfig.getJarFile().getName() + "-" + project.getName() + ".csv";
     }
 
     private String buildTitleLine() {
@@ -78,7 +78,7 @@ public class MultiCSVSummaryWriter implements IResultWriter{
         var firstSubmissionName = comparison.getFirstSubmissionName();
         var secondSubmissionName = comparison.getSecondSubmissionName();
 
-        if (Math.min(Math.min(minimalSimilarity,maximalSimilarity),similarity) < 0.01 && type == SubmissionPairType.NO_PLAGIARISM)
+        if (Math.min(Math.min(minimalSimilarity, maximalSimilarity), similarity) < 0.01 && type == SubmissionPairType.NO_PLAGIARISM)
             return "";
 
         return String.format("%s,%s,%.2f,%.2f,%.2f,%s\n",

@@ -120,7 +120,7 @@ public class DataLoader implements IDataLoader {
         var configs = new ArrayList<JarConfig>();
 
         jarsArray.forEach(element -> {
-            configs.add(buildJarConfig( (JSONObject)element ));
+            configs.add(buildJarConfig((JSONObject) element));
         });
 
         return configs;
@@ -145,7 +145,7 @@ public class DataLoader implements IDataLoader {
         var setterName = overrideEntry.getString("setter");
         var type = overrideEntry.getString("type");
         var value = overrideEntry.getString("value");
-        return new OptionsOverride(setterName,type, value);
+        return new OptionsOverride(setterName, type, value);
     }
 
 

@@ -1,7 +1,5 @@
 package ba.kripas.jplag;
 
-import ba.kripas.dataset.SubmissionPairType;
-
 public class JPlagComparisonWrapper {
     private final String firstSubmissionName;
     private final String secondSubmissionName;
@@ -10,7 +8,7 @@ public class JPlagComparisonWrapper {
     private final float minimalSimilarity;
     private final float similarity;
 
-    public JPlagComparisonWrapper(String firstSubmissionName, String secondSubmissionName ,float maximalSimilarity, float minimalSimilarity, float similarity) {
+    public JPlagComparisonWrapper(String firstSubmissionName, String secondSubmissionName, float maximalSimilarity, float minimalSimilarity, float similarity) {
         this.firstSubmissionName = firstSubmissionName;
         this.secondSubmissionName = secondSubmissionName;
         this.maximalSimilarity = maximalSimilarity;

@@ -27,7 +27,7 @@ public class JPlagWrapper {
 
     public void Load() throws IncompatibleInterface {
         try {
-            ClassLoader classLoader = new URLClassLoader( new URL[]{farFileURL} );
+            ClassLoader classLoader = new URLClassLoader(new URL[]{farFileURL});
             JPlagOptionsClass = Class.forName("de.jplag.options.JPlagOptions", true, classLoader);
             JPlagLanguageOptionClass = Class.forName("de.jplag.options.LanguageOption", true, classLoader);
             JPlagClass = Class.forName("de.jplag.JPlag", true, classLoader);
@@ -69,7 +69,7 @@ public class JPlagWrapper {
     }
 
     private Object buildLanguageOption(String language) throws ClassNotFoundException {
-        return Enum.valueOf( (Class<Enum>) JPlagLanguageOptionClass, language);
+        return Enum.valueOf((Class<Enum>) JPlagLanguageOptionClass, language);
     }
 
     private JPlagResultWrapper buildResult(Object rawResultObject) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -77,8 +77,8 @@ public class JPlagWrapper {
         var getNumberOfSubmissionsMethod = JPlagResultClass.getMethod("getNumberOfSubmissions");
         var getComparisonsMethod = JPlagResultClass.getMethod("getComparisons");
 
-        long duration = (long)getDurationMethod.invoke(rawResultObject);
-        int numberOfSubmissions = (int)getNumberOfSubmissionsMethod.invoke(rawResultObject);
+        long duration = (long) getDurationMethod.invoke(rawResultObject);
+        int numberOfSubmissions = (int) getNumberOfSubmissionsMethod.invoke(rawResultObject);
 
         List<?> rawComparisons = (List<?>) getComparisonsMethod.invoke(rawResultObject);
         List<JPlagComparisonWrapper> comparisons = new ArrayList<>();
@@ -95,17 +95,17 @@ public class JPlagWrapper {
 
         var getFirstSubmission = JPlagComparisonClass.getMethod("getFirstSubmission");
         var firstSubmission = getFirstSubmission.invoke(rawComparisonObject);
-        var firstSubmissionName = (String)getSubmissionName.invoke(firstSubmission);
+        var firstSubmissionName = (String) getSubmissionName.invoke(firstSubmission);
 
         var getSecondSubmission = JPlagComparisonClass.getMethod("getSecondSubmission");
         var secondSubmission = getSecondSubmission.invoke(rawComparisonObject);
-        var secondSubmissionName = (String)getSubmissionName.invoke(secondSubmission);
+        var secondSubmissionName = (String) getSubmissionName.invoke(secondSubmission);
 
         var getMaximalSimilarity = JPlagComparisonClass.getMethod("maximalSimilarity");
-        var maximalSimilarity = (float)getMaximalSimilarity.invoke(rawComparisonObject);
+        var maximalSimilarity = (float) getMaximalSimilarity.invoke(rawComparisonObject);
 
         var getMinimalSimilarity = JPlagComparisonClass.getMethod("minimalSimilarity");
-        var minimalSimilarity = (float)getMinimalSimilarity.invoke(rawComparisonObject);
+        var minimalSimilarity = (float) getMinimalSimilarity.invoke(rawComparisonObject);
 
         var getSimilarity = JPlagComparisonClass.getMethod("similarity");
         var similarity = (float) getSimilarity.invoke(rawComparisonObject);

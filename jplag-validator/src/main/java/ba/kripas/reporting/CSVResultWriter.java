@@ -65,7 +65,7 @@ public class CSVResultWriter implements IResultWriter {
 
         var commit = jarConfig.getCommitId().substring(0, 6);
 
-        if (Math.min(Math.min(minimalSimilarity,maximalSimilarity),similarity) < 0.01 && type == SubmissionPairType.NO_PLAGIARISM)
+        if (Math.min(Math.min(minimalSimilarity, maximalSimilarity), similarity) < 0.01 && type == SubmissionPairType.NO_PLAGIARISM)
             return "";
 
         return String.format("%s,%s,%s,%s,%s,%.2f,%.2f,%.2f,%s\n",
