@@ -25,12 +25,14 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/de.jplag/jplag -->
+    <!-- https://mvnrepository.com/artifact/org.json/json -->
     <dependency>
-      <groupId>de.jplag</groupId>
-      <artifactId>jplag</artifactId>
-      <version>3.0.0</version>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20220320</version>
     </dependency>
+
+
   </dependencies>
 
   <build>
