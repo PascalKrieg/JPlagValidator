@@ -1,10 +1,13 @@
 package ba.kripas.jplag;
 
+import ba.kripas.dataset.Project;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,15 +19,15 @@ public class JPlagWrapper {
     private Class<?> JPlagComparisonClass;
     private Class<?> SubmissionClass;
 
-    private final URL jarFile;
+    private final URL farFileURL;
 
-    public JPlagWrapper(File jarPath) throws MalformedURLException {
-        this.jarFile = jarPath.toURI().toURL();
+    public JPlagWrapper(File farFileURL) throws MalformedURLException {
+        this.farFileURL = farFileURL.toURI().toURL();
     }
 
     public void Load() throws IncompatibleInterface {
         try {
-            ClassLoader classLoader = new URLClassLoader( new URL[]{jarFile} );
+            ClassLoader classLoader = new URLClassLoader( new URL[]{farFileURL} );
             JPlagOptionsClass = Class.forName("de.jplag.options.JPlagOptions", true, classLoader);
             JPlagLanguageOptionClass = Class.forName("de.jplag.options.LanguageOption", true, classLoader);
             JPlagClass = Class.forName("de.jplag.JPlag", true, classLoader);
@@ -37,9 +40,12 @@ public class JPlagWrapper {
         }
     }
 
-    public JPlagResultWrapper run(String submissionPath) throws IncompatibleInterface {
+    public JPlagResultWrapper run(Project targetProject) throws IncompatibleInterface {
         try {
-            var JPlagObject = buildJPlag(submissionPath, "C_CPP");
+            var languageString = targetProject.getLanguage().getJplagConfigIdentifier();
+            var projectPath = targetProject.getPath();
+
+            var JPlagObject = buildJPlag(projectPath, languageString);
 
             var runMethod = JPlagClass.getMethod("run");
             var JPlagResult = runMethod.invoke(JPlagObject);
@@ -51,15 +57,15 @@ public class JPlagWrapper {
         }
     }
 
-    private Object buildJPlag(String submissionPath, String language) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    private Object buildJPlag(Path submissionPath, String language) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Object JPlagOptions = buildJPlagOptions(submissionPath, language);
         return JPlagClass.getConstructor(JPlagOptionsClass).newInstance(JPlagOptions);
     }
 
-    private Object buildJPlagOptions(String submissionPath, String language) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    private Object buildJPlagOptions(Path submissionPath, String language) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         var languageOption = buildLanguageOption(language);
         var constructor = JPlagOptionsClass.getConstructor(String.class, JPlagLanguageOptionClass);
-        return constructor.newInstance(submissionPath, languageOption);
+        return constructor.newInstance(submissionPath.toString(), languageOption);
     }
 
     private Object buildLanguageOption(String language) throws ClassNotFoundException {

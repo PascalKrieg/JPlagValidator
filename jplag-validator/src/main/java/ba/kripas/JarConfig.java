@@ -24,6 +24,7 @@ public class JarConfig {
     }
 
     public JarConfig(File jarFile, String commitId, List<OptionsOverride> optionsOverrides) {
+        System.out.println(jarFile.getAbsolutePath());
         this.jarFile = jarFile;
         this.commitId = commitId;
         this.optionsOverrides = optionsOverrides;

@@ -1,46 +1,44 @@
 package ba.kripas;
 
-import ba.kripas.jplag.IncompatibleInterface;
-import ba.kripas.jplag.JPlagWrapper;
+import ba.kripas.dataset.DataLoader;
+import ba.kripas.reporting.IResultWriter;
+import ba.kripas.reporting.MultiCSVSummaryWriter;
+import ba.kripas.running.JPlagRunner;
 
-import java.io.File;
-import java.net.MalformedURLException;
+import java.io.IOException;
 
 public class App
 {
     public static void main( String[] args )
     {
+        String baseDirectory = args[0];
+
+        String DATASET_PATH = baseDirectory + "/dataset";
+        String JARS_PATH = baseDirectory + "/jars";
+        String RESULT_PATH = baseDirectory + "/results";
+
         try {
-            RunEvaluation("/Users/pascal/Bachelorarbeit/Code/JPlagValidator/jplag-test.jar");
-            RunEvaluation("/Users/pascal/Bachelorarbeit/Code/JPlagValidator/jplag-test-2.jar");
-        } catch (MalformedURLException e) {
-            System.out.println("Jar does not exist.");
-            e.printStackTrace();
-        } catch (IncompatibleInterface e) {
-            System.out.println("JPlag version does not seem to be compatible.");
+            System.out.println("Initialize loader");
+            var loader = new DataLoader(DATASET_PATH, JARS_PATH);
+
+            System.out.println("Loading config");
+            var config = loader.LoadConfig();
+            System.out.println("Config loaded");
+
+            System.out.println("Initializing runner");
+            JPlagRunner runner = new JPlagRunner(config.getJarConfigs(), config.getProjects());
+
+            System.out.println("Running...");
+            var summary = runner.Run();
+            System.out.println("Finished Running");
+
+            System.out.println("Writing result");
+            IResultWriter writer = new MultiCSVSummaryWriter(RESULT_PATH);
+
+            writer.writeResult(summary);
+            System.out.println("Finished running");
+        } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private static void RunEvaluation(String jarPath) throws MalformedURLException, IncompatibleInterface {
-        String submissionFolder = "/Users/pascal/Bachelorarbeit/AutomaticEval/dataset";
-        String language = "C_CPP";
-
-        File testJar = new File(jarPath);
-
-        JPlagWrapper loader = new JPlagWrapper(testJar);
-        loader.Load();
-        loader.run(submissionFolder);
-        //var JPlagWrapper = loader.buildJPlag(submissionFolder, language);
-
-
-        /*
-        EvaluationOptions evaluationOptions = new EvaluationOptions(20f);
-        IResultWriter writer = new CSVResultWriter("/Users/pascal/Bachelorarbeit/AutomaticEval");
-        EvaluationRunner evaluationRunner = new EvaluationRunner(writer, evaluationOptions);
-
-        evaluationRunner.Run(jPlag);
-         */
-
     }
 }

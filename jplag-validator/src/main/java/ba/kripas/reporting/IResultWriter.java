@@ -1,7 +1,7 @@
 package ba.kripas.reporting;
 
-import ba.kripas.ResultAggregate;
+import ba.kripas.Summary;
 
 public interface IResultWriter {
-    void writeResult(ResultAggregate result);
+    void writeResult(Summary result);
 }

@@ -1,13 +1,15 @@
 package ba.kripas.dataset;
 
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
 
 public class Project {
     private final String name;
     private final Path path;
+    private final Language language;
 
-    private final Map<String, SubmissionPairType> pairTypes;
+    private final HashMap<String, SubmissionPairType> pairMap;
 
     public String getName() {
         return name;
@@ -17,18 +19,30 @@ public class Project {
         return path;
     }
 
-    public Project(String name, Path path, Map<String, SubmissionPairType> pairTypes) {
-        this.name = name;
-        this.path = path;
-        this.pairTypes = pairTypes;
+    public Language getLanguage() {
+        return language;
     }
 
-    private SubmissionPairType GetPairType(String first, String second) {
+    public Project(String name, Path path, Language language, List<SubmissionPair> submissionPairs) {
+        this.name = name;
+        this.path = path;
+        this.language = language;
+        pairMap = new HashMap<>();
+        submissionPairs.forEach(submissionPair -> {
+            pairMap.put(buildKey(submissionPair), submissionPair.getType());
+        });
+    }
+
+    public SubmissionPairType GetPairType(String first, String second) {
         var key = buildKey(first, second);
-        if (!pairTypes.containsKey(key))
+        if (!pairMap.containsKey(key))
             return SubmissionPairType.NO_PLAGIARISM;
 
-        return pairTypes.get(key);
+        return pairMap.get(key);
+    }
+
+    private static String buildKey(SubmissionPair pair) {
+        return buildKey(pair.getFirstSubmission(), pair.getSecondSubmission());
     }
 
     private static String buildKey(String firstSubmission, String secondSubmission) {
