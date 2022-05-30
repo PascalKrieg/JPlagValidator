@@ -1,17 +1,20 @@
 package ba.kripas.jplag;
 
 import ba.kripas.dataset.Project;
+import ba.kripas.running.JarConfig;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class JPlagWrapper {
+    private ClassLoader classLoader;
+
     private Class<?> JPlagOptionsClass;
     private Class<?> JPlagLanguageOptionClass;
     private Class<?> JPlagClass;
@@ -19,15 +22,19 @@ public class JPlagWrapper {
     private Class<?> JPlagComparisonClass;
     private Class<?> SubmissionClass;
 
-    private final URL farFileURL;
+    private List<ConfigSetterContainer> configSettings = new ArrayList<>();
 
-    public JPlagWrapper(File farFileURL) throws MalformedURLException {
-        this.farFileURL = farFileURL.toURI().toURL();
+    private final URL jarFile;
+
+    public JPlagWrapper(JarConfig jarConfig) throws MalformedURLException, IncompatibleInterfaceException, InvalidOptionsException {
+        this.jarFile = jarConfig.getJarFile().toURI().toURL();
+        Load();
+        LoadConfigSetters(jarConfig.getOptionsOverrides());
     }
 
-    public void Load() throws IncompatibleInterface {
+    private void Load() throws IncompatibleInterfaceException {
         try {
-            ClassLoader classLoader = new URLClassLoader(new URL[]{farFileURL});
+            classLoader = new URLClassLoader(new URL[]{jarFile});
             JPlagOptionsClass = Class.forName("de.jplag.options.JPlagOptions", true, classLoader);
             JPlagLanguageOptionClass = Class.forName("de.jplag.options.LanguageOption", true, classLoader);
             JPlagClass = Class.forName("de.jplag.JPlag", true, classLoader);
@@ -36,11 +43,59 @@ public class JPlagWrapper {
             SubmissionClass = Class.forName("de.jplag.Submission", true, classLoader);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            throw new IncompatibleInterface();
+            throw new IncompatibleInterfaceException();
         }
     }
 
-    public JPlagResultWrapper run(Project targetProject) throws IncompatibleInterface {
+    private void LoadConfigSetters(Collection<OptionsOverride> optionsOverrides) throws InvalidOptionsException {
+        try {
+            for (var override : optionsOverrides) {
+
+                var type = override.getType();
+                var valueString = override.getValue();
+
+                var parsedValue = parseValueAndType(valueString, type);
+                var setter = JPlagOptionsClass.getMethod(override.getSetter(), parsedValue.getClass());
+
+                configSettings.add(new ConfigSetterContainer(setter, parsedValue));
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+            throw new InvalidOptionsException();
+        }
+    }
+
+    private Object parseValueAndType(String value, String type) throws InvalidOptionsException {
+        try {
+            switch (type.toLowerCase()) {
+                case "int":
+                case "integer":
+                    return Integer.parseInt(value);
+                case "float":
+                    return Float.parseFloat(value);
+                case "bool":
+                case "boolean":
+                    return Boolean.parseBoolean(value); // Note: every value other than "true" is returned as false, even if it is not a bool
+            }
+        } catch (NumberFormatException e) {
+            throw new InvalidOptionsException("Invalid Options: Cannot parse " + type + " (" + value + ")");
+        }
+
+        if (!type.toLowerCase().startsWith("enum:"))
+            throw new InvalidOptionsException("Unknown type: " + type);
+
+        var enumType = type.substring(5, type.length());
+        try {
+            var enumClass = Class.forName(enumType, true, classLoader);
+            return Enum.valueOf((Class<Enum>) enumClass, value);
+        } catch (ClassNotFoundException e) {
+            throw new InvalidOptionsException("Unkown enum: " + enumType);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidOptionsException("Unkown enum value " + value + " for enum type " + enumType);
+        }
+    }
+
+    public JPlagResultWrapper run(Project targetProject) throws IncompatibleInterfaceException {
         try {
             var languageString = targetProject.getLanguage().getJplagConfigIdentifier();
             var projectPath = targetProject.getPath();
@@ -53,7 +108,7 @@ public class JPlagWrapper {
             return buildResult(JPlagResult);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | InstantiationException e) {
             e.printStackTrace();
-            throw new IncompatibleInterface();
+            throw new IncompatibleInterfaceException();
         }
     }
 
@@ -62,13 +117,21 @@ public class JPlagWrapper {
         return JPlagClass.getConstructor(JPlagOptionsClass).newInstance(JPlagOptions);
     }
 
-    private Object buildJPlagOptions(Path submissionPath, String language) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    private Object buildJPlagOptions(Path submissionPath, String language) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         var languageOption = buildLanguageOption(language);
         var constructor = JPlagOptionsClass.getConstructor(String.class, JPlagLanguageOptionClass);
-        return constructor.newInstance(submissionPath.toString(), languageOption);
+        var optionsInstance = constructor.newInstance(submissionPath.toString(), languageOption);
+
+        for (var setterContainer : configSettings) {
+            var setter = setterContainer.getSetter();
+            var value = setterContainer.getValue();
+            setter.invoke(optionsInstance, value);
+        }
+
+        return optionsInstance;
     }
 
-    private Object buildLanguageOption(String language) throws ClassNotFoundException {
+    private Object buildLanguageOption(String language) {
         return Enum.valueOf((Class<Enum>) JPlagLanguageOptionClass, language);
     }
 

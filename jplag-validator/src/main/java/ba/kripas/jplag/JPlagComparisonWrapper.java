@@ -1,6 +1,8 @@
 package ba.kripas.jplag;
 
-public class JPlagComparisonWrapper {
+import java.util.Objects;
+
+public class JPlagComparisonWrapper implements Comparable {
     private final String firstSubmissionName;
     private final String secondSubmissionName;
 
@@ -34,5 +36,12 @@ public class JPlagComparisonWrapper {
 
     public float getSimilarity() {
         return similarity;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (this == o) return 0;
+        JPlagComparisonWrapper that = (JPlagComparisonWrapper) o;
+        return Float.compare(that.similarity, similarity);
     }
 }

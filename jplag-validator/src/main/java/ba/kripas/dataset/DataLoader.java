@@ -1,6 +1,6 @@
 package ba.kripas.dataset;
 
-import ba.kripas.JarConfig;
+import ba.kripas.running.JarConfig;
 import ba.kripas.jplag.OptionsOverride;
 import ba.kripas.running.RunningConfig;
 import org.json.*;
@@ -9,6 +9,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -115,38 +116,58 @@ public class DataLoader implements IDataLoader {
     private List<JarConfig> loadJarConfigs() throws IOException {
         var content = new String(Files.readAllBytes(Paths.get(jarRootPath, CONFIG_FILE_NAME)));
         var fullFile = new JSONObject(content);
-        var jarsArray = fullFile.getJSONArray("jars");
 
+        var jarsArray = fullFile.getJSONArray("jars");
         var configs = new ArrayList<JarConfig>();
 
         jarsArray.forEach(element -> {
-            configs.add(buildJarConfig((JSONObject) element));
+            configs.addAll(buildConfigsForJar((JSONObject) element));
         });
 
         return configs;
     }
 
-    private JarConfig buildJarConfig(JSONObject jarEntry) {
+    private Collection<JarConfig> buildConfigsForJar(JSONObject jarEntry) {
         var jarFileName = jarEntry.getString("file");
+        var jarFile = new File(jarRootPath, jarFileName);
         var commitId = jarEntry.getString("commit");
-        var configs = jarEntry.getJSONArray("configs");
-        // TODO: Parse configs
-        return new JarConfig(new File(jarRootPath, jarFileName), commitId, new LinkedList<>());
+
+        var configs = new LinkedList<JarConfig>();
+
+        var configsJSONArray = jarEntry.getJSONArray("configs");
+
+        if (configsJSONArray.isEmpty()) {
+            configs.add(new JarConfig(jarFile, commitId, "default", new ArrayList<>()));
+        }
+
+        // Read every config for one jar file
+        for (var configJSONObject : configsJSONArray) {
+
+            var config = buildJarConfig(jarFile, commitId, (JSONObject) configJSONObject);
+            configs.add(config);
+        }
+
+        return configs;
     }
 
-    /*
-    {
-        "setter" : "setSpecificParameter",
-        "type" : "int",
-        "value" : 8
+    private JarConfig buildJarConfig(File jarFile, String commitId, JSONObject configJSONObject) {
+        var configId = configJSONObject.getString("config_id");
+        var optionsJSONArray = configJSONObject.getJSONArray("options");
+
+        var optionsOverrides = new LinkedList<OptionsOverride>();
+
+        for (var optionJSonObject : optionsJSONArray) {
+            var option = (JSONObject) optionJSonObject;
+            optionsOverrides.add(buildOptionsEntry(option));
+        }
+
+        return new JarConfig(jarFile, commitId, configId, optionsOverrides);
     }
-     */
-    private OptionsOverride buildOptionsOverride(JSONObject overrideEntry) {
-        var setterName = overrideEntry.getString("setter");
-        var type = overrideEntry.getString("type");
-        var value = overrideEntry.getString("value");
+
+    private OptionsOverride buildOptionsEntry(JSONObject optionsEntry) {
+        var setterName = optionsEntry.getString("setter");
+        var type = optionsEntry.getString("type");
+        var value = optionsEntry.getString("value");
         return new OptionsOverride(setterName, type, value);
     }
-
-
 }

@@ -1,6 +1,5 @@
 package ba.kripas.running;
 
-import ba.kripas.JarConfig;
 import ba.kripas.dataset.Project;
 
 

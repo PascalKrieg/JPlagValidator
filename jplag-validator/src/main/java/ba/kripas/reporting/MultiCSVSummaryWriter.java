@@ -1,23 +1,27 @@
 package ba.kripas.reporting;
 
-import ba.kripas.JarConfig;
-import ba.kripas.Summary;
-import ba.kripas.dataset.Project;
-import ba.kripas.dataset.SubmissionPairType;
-import ba.kripas.jplag.JPlagComparisonWrapper;
+import ba.kripas.reporting.csv.CSVJarResultFileBuilder;
+import ba.kripas.reporting.csv.CSVSummaryFileBuilder;
+import ba.kripas.running.Summary;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.List;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 
 public class MultiCSVSummaryWriter implements IResultWriter {
     private final String targetPath;
 
+    private final DecimalFormat formatter;
+
     public MultiCSVSummaryWriter(String targetPath) {
         this.targetPath = targetPath;
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        formatter = new DecimalFormat("###.##", symbols);
     }
 
     @Override
@@ -34,22 +38,28 @@ public class MultiCSVSummaryWriter implements IResultWriter {
     }
 
     private void writeFiles(Summary summary, File parentDirectory) {
+        writeJarRunFiles(summary, parentDirectory);
+        writeSummaryFile(summary, parentDirectory);
+    }
+
+    private void writeSummaryFile(Summary summary, File parentDirectory) {
+        var summaryFileBuilder = new CSVSummaryFileBuilder(formatter);
+        var fileName = summaryFileBuilder.buildFileName();
+        var content = summaryFileBuilder.buildContent(summary);
+
+        writeSingleFile(new File(parentDirectory, fileName), content);
+    }
+
+    private void writeJarRunFiles(Summary summary, File parentDirectory) {
+        var JarResultBuilder = new CSVJarResultFileBuilder(formatter);
+
         summary.getJarResults().forEach(jarRunResult -> {
             jarRunResult.getProjectResult().forEach(projectRunResult -> {
-                var fileName = buildFileName(jarRunResult.getConfig(), projectRunResult.getProject());
-                var content = buildFileContent(projectRunResult.getProject(), projectRunResult.getComparisons());
+                var fileName = JarResultBuilder.buildJarResultFileName(jarRunResult.getConfig(), projectRunResult.getProject());
+                var content = JarResultBuilder.buildJarResultContent(projectRunResult.getProject(), projectRunResult.getComparisons());
                 writeSingleFile(new File(parentDirectory, fileName), content);
             });
         });
-    }
-
-    private String buildFileContent(Project project, List<JPlagComparisonWrapper> comparisons) {
-        StringBuilder sb = new StringBuilder(buildTitleLine());
-        comparisons.forEach(comparison -> {
-            var actualType = project.GetPairType(comparison.getFirstSubmissionName(), comparison.getSecondSubmissionName());
-            sb.append(buildEntryLine(comparison, actualType));
-        });
-        return sb.toString();
     }
 
     private void writeSingleFile(File file, String content) {
@@ -61,33 +71,4 @@ public class MultiCSVSummaryWriter implements IResultWriter {
             e.printStackTrace();
         }
     }
-
-    private String buildFileName(JarConfig jarConfig, Project project) {
-        return jarConfig.getCommitId().substring(0, 6) + "-" + jarConfig.getJarFile().getName() + "-" + project.getName() + ".csv";
-    }
-
-    private String buildTitleLine() {
-        return "first_submission,second_submission,similarity,minimal_similarity,maximal_similarity,type\n";
-    }
-
-    private String buildEntryLine(JPlagComparisonWrapper comparison, SubmissionPairType type) {
-        var minimalSimilarity = comparison.getMinimalSimilarity();
-        var maximalSimilarity = comparison.getMaximalSimilarity();
-        var similarity = comparison.getSimilarity();
-
-        var firstSubmissionName = comparison.getFirstSubmissionName();
-        var secondSubmissionName = comparison.getSecondSubmissionName();
-
-        if (Math.min(Math.min(minimalSimilarity, maximalSimilarity), similarity) < 0.01 && type == SubmissionPairType.NO_PLAGIARISM)
-            return "";
-
-        return String.format("%s,%s,%.2f,%.2f,%.2f,%s\n",
-                firstSubmissionName,
-                secondSubmissionName,
-                similarity,
-                minimalSimilarity,
-                maximalSimilarity,
-                type.toString());
-    }
-
 }

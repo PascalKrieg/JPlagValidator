@@ -1,4 +1,4 @@
-package ba.kripas;
+package ba.kripas.running;
 
 import ba.kripas.jplag.OptionsOverride;
 
@@ -9,6 +9,8 @@ import java.util.List;
 public class JarConfig {
     private final File jarFile;
     private final String commitId;
+    private final String configId;
+
     private final List<OptionsOverride> optionsOverrides;
 
     public File getJarFile() {
@@ -19,14 +21,18 @@ public class JarConfig {
         return commitId;
     }
 
+    public String getConfigId() {
+        return configId;
+    }
+
     public Collection<OptionsOverride> getOptionsOverrides() {
         return optionsOverrides;
     }
 
-    public JarConfig(File jarFile, String commitId, List<OptionsOverride> optionsOverrides) {
-        System.out.println(jarFile.getAbsolutePath());
+    public JarConfig(File jarFile, String commitId, String configId, List<OptionsOverride> optionsOverrides) {
         this.jarFile = jarFile;
         this.commitId = commitId;
+        this.configId = configId;
         this.optionsOverrides = optionsOverrides;
     }
 }

@@ -1,9 +1,8 @@
 package ba.kripas.running;
 
-import ba.kripas.JarConfig;
-import ba.kripas.Summary;
 import ba.kripas.dataset.Project;
-import ba.kripas.jplag.IncompatibleInterface;
+import ba.kripas.jplag.IncompatibleInterfaceException;
+import ba.kripas.jplag.InvalidOptionsException;
 import ba.kripas.jplag.JPlagWrapper;
 
 import java.net.MalformedURLException;
@@ -24,21 +23,18 @@ public class JPlagRunner {
         for (var config : jarConfigs) {
             try {
                 result.add(RunJar(config, this.projects));
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IncompatibleInterface e) {
+            } catch (MalformedURLException | IncompatibleInterfaceException | InvalidOptionsException e) {
                 e.printStackTrace();
             }
         }
 
-        var aggregate = new Summary(result);
-
-        return aggregate;
+        return new Summary(result);
     }
 
-    public static JarRunResult RunJar(JarConfig jarConfig, List<Project> projects) throws MalformedURLException, IncompatibleInterface {
-        var jPlag = new JPlagWrapper(jarConfig.getJarFile());
-        jPlag.Load();
+    public static JarRunResult RunJar(JarConfig jarConfig, List<Project> projects) throws MalformedURLException, IncompatibleInterfaceException, InvalidOptionsException {
+        System.out.println("Running: " + jarConfig.getJarFile().getName() + "-" + jarConfig.getConfigId());
+
+        var jPlag = new JPlagWrapper(jarConfig);
 
         List<ProjectRunResult> results = new ArrayList<>();
         List<Project> errorProjects = new ArrayList<>();

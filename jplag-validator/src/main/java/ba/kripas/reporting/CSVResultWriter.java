@@ -1,7 +1,7 @@
 package ba.kripas.reporting;
 
-import ba.kripas.JarConfig;
-import ba.kripas.Summary;
+import ba.kripas.running.JarConfig;
+import ba.kripas.running.Summary;
 import ba.kripas.dataset.SubmissionPairType;
 import ba.kripas.jplag.JPlagComparisonWrapper;
 

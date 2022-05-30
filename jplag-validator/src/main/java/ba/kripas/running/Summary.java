@@ -1,8 +1,9 @@
-package ba.kripas;
+package ba.kripas.running;
 
 import ba.kripas.running.JarRunResult;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -10,8 +11,12 @@ public class Summary {
     private final List<JarRunResult> jarResults;
     private final Date timestamp;
 
-    public List<JarRunResult> getJarResults() {
+    public Collection<JarRunResult> getJarResults() {
         return jarResults;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
     }
 
     public Summary() {
