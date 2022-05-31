@@ -6,9 +6,13 @@ import ba.kripas.jplag.InvalidOptionsException;
 import ba.kripas.jplag.JPlagWrapper;
 
 import java.net.MalformedURLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 public class JPlagRunner {
+    private static Logger logger = Logger.getLogger("ba.kripas.running.JPlagRunner");
+
     private final List<JarConfig> jarConfigs;
     private final List<Project> projects;
 
@@ -32,7 +36,7 @@ public class JPlagRunner {
     }
 
     public static JarRunResult RunJar(JarConfig jarConfig, List<Project> projects) throws MalformedURLException, IncompatibleInterfaceException, InvalidOptionsException {
-        System.out.println("Running: " + jarConfig.getJarFile().getName() + "-" + jarConfig.getConfigId());
+        logger.info("Running: " + jarConfig.getJarFile().getName() + "-" + jarConfig.getConfigId());
 
         var jPlag = new JPlagWrapper(jarConfig);
 

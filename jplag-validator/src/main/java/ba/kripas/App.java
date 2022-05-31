@@ -6,8 +6,11 @@ import ba.kripas.reporting.MultiCSVSummaryWriter;
 import ba.kripas.running.JPlagRunner;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 public class App {
+    private static final Logger logger = Logger.getLogger("ba.kripas.App");
+
     public static void main(String[] args) {
         String baseDirectory = args[0];
 
@@ -16,25 +19,25 @@ public class App {
         String RESULT_PATH = baseDirectory + "/results";
 
         try {
-            System.out.println("Initialize loader");
+            logger.fine("Initialize loader");
             var loader = new DataLoader(DATASET_PATH, JARS_PATH);
 
-            System.out.println("Loading config");
+            logger.fine("Loading config");
             var config = loader.LoadConfig();
-            System.out.println("Config loaded");
+            logger.fine("Config loaded");
 
-            System.out.println("Initializing runner");
+            logger.fine("Initializing runner");
             JPlagRunner runner = new JPlagRunner(config.getJarConfigs(), config.getProjects());
 
-            System.out.println("Running...");
+            logger.fine("Running...");
             var summary = runner.Run();
-            System.out.println("Finished Running");
+            logger.fine("Finished Running");
 
-            System.out.println("Writing result");
+            logger.fine("Writing result");
             IResultWriter writer = new MultiCSVSummaryWriter(RESULT_PATH);
 
             writer.writeResult(summary);
-            System.out.println("Finished running");
+            logger.fine("Finished running");
         } catch (IOException e) {
             e.printStackTrace();
         }
