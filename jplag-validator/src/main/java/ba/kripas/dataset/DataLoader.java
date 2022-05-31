@@ -1,11 +1,14 @@
 package ba.kripas.dataset;
 
-import ba.kripas.running.JarConfig;
 import ba.kripas.jplag.OptionsOverride;
+import ba.kripas.running.JarConfig;
 import ba.kripas.running.RunningConfig;
-import org.json.*;
+import org.json.JSONObject;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
