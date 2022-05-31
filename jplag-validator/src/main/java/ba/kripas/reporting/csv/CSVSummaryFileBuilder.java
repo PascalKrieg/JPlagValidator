@@ -38,10 +38,11 @@ public class CSVSummaryFileBuilder {
     }
 
     private String buildEntryLine(JarConfig jarConfig, ProjectRunResult projectRunResult) {
-        var evaluation = evaluator.getForThreshold(projectRunResult, 30f);
+        //var evaluation = evaluator.getForThreshold(projectRunResult, 30f);
+        var evaluation = evaluator.getForPercentile(projectRunResult, 0.95f);
 
         return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d,%d,%d\n",
-                jarConfig.getCommitId(),
+                jarConfig.getCommitId().substring(0, 9),
                 jarConfig.getJarFile().getName(),
                 jarConfig.getConfigId(),
                 projectRunResult.getProject().getName(),
