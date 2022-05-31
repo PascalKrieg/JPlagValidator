@@ -21,6 +21,12 @@ public class EvaluationMetrics {
         return (float) truePositives / (truePositives + falseNegatives);
     }
 
+    public float getFMeasure() {
+        var precision = getPrecision();
+        var recall = getRecall();
+        return 2 * precision * recall / (precision + recall);
+    }
+
     public int getTruePositives() {
         return truePositives;
     }
