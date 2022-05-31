@@ -90,7 +90,7 @@ public class JarRunEvaluator {
     }
 
     private void evaluateComparison(JPlagComparisonWrapper comparison, SubmissionPairType actualType, float threshold) {
-        if (comparison.getSimilarity() < threshold) {
+        if (comparison.getSimilarity() <= threshold) {
             // Not suspicious
             if (actualType == SubmissionPairType.NO_PLAGIARISM) {
                 // Not Suspicious and is not plagiarism
@@ -116,7 +116,7 @@ public class JarRunEvaluator {
         var copy = new ArrayList<>(result.getComparisons());
         copy.sort(JPlagComparisonWrapper::compareTo);
 
-        return copy.get(thresholdIndex).getSimilarity();
+        return copy.get(total - thresholdIndex).getSimilarity();
     }
 }
 
