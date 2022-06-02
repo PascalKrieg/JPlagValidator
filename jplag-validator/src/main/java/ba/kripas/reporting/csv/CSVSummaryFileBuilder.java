@@ -34,14 +34,14 @@ public class CSVSummaryFileBuilder {
     }
 
     private String buildTitleLine() {
-        return "commit,jar_file,config_id,project,submissions,runtime,precision,recall,f_measure,true_positives,true_negatives,false_positives,false_negatives\n";
+        return "commit,jar_file,config_id,project,submissions,runtime,precision,recall,f_measure,balanced_accuracy,true_positives,true_negatives,false_positives,false_negatives\n";
     }
 
     private String buildEntryLine(JarConfig jarConfig, ProjectRunResult projectRunResult) {
         //var evaluation = evaluator.getForThreshold(projectRunResult, 30f);
         var evaluation = evaluator.getForPercentile(projectRunResult, 0.95f);
 
-        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d,%d,%d\n",
+        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d,%d,%d\n",
                 jarConfig.getCommitId().substring(0, 9),
                 jarConfig.getJarFile().getName(),
                 jarConfig.getConfigId(),
@@ -51,6 +51,7 @@ public class CSVSummaryFileBuilder {
                 formatter.format(evaluation.getPrecision()),
                 formatter.format(evaluation.getRecall()),
                 formatter.format(evaluation.getFMeasure()),
+                formatter.format(evaluation.getBalancedAccuracy()),
                 evaluation.getTruePositives(),
                 evaluation.getTrueNegatives(),
                 evaluation.getFalsePositives(),

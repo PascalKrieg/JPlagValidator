@@ -27,6 +27,18 @@ public class EvaluationMetrics {
         return 2 * precision * recall / (precision + recall);
     }
 
+    public float getBalancedAccuracy() {
+        return (getTruePositiveRate() + getTrueNegativeRate()) / 2;
+    }
+
+    public int getTotalPositives() {
+        return truePositives + falsePositives;
+    }
+
+    public int getTotalNegatives() {
+        return trueNegatives + falseNegatives;
+    }
+
     public int getTruePositives() {
         return truePositives;
     }
@@ -41,6 +53,22 @@ public class EvaluationMetrics {
 
     public int getFalseNegatives() {
         return falseNegatives;
+    }
+
+    public float getTruePositiveRate() {
+        return (float)getTruePositives() / getTotalPositives();
+    }
+
+    public float getTrueNegativeRate() {
+        return (float)getTrueNegatives() / getTotalNegatives();
+    }
+
+    public float getFalsePositiveRate() {
+        return (float) getFalsePositives() / getTotalNegatives();
+    }
+
+    public float getFalseNegativeRate() {
+        return (float) getFalseNegatives() / getTotalPositives();
     }
 
     public EvaluationMetrics(long runtime, int truePositives, int falsePositives, int trueNegatives, int falseNegatives) {
