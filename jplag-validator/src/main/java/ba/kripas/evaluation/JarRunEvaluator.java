@@ -106,8 +106,8 @@ public class JarRunEvaluator {
         } else {
             switch (actualType) {
                 case NO_PLAGIARISM -> trueNegatives++;
-                case COMMON_PLAG -> truePositivesCommon++;
-                default -> truePositivesMossad++;
+                case COMMON_PLAG -> falseNegativesCommon++;
+                default -> falseNegativesMossad++;
             }
         }
     }

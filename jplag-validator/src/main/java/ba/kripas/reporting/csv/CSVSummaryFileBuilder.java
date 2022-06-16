@@ -39,10 +39,15 @@ public class CSVSummaryFileBuilder {
 
     private String buildEntryLine(JarConfig jarConfig, ProjectRunResult projectRunResult) {
         //var evaluation = evaluator.getForThreshold(projectRunResult, 30f);
-        var evaluation = evaluator.getForPercentile(projectRunResult, 0.95f);
+        var evaluation = evaluator.getForThreshold(projectRunResult, 80f);
+
+        var commitId = jarConfig.getCommitId();
+
+        if (commitId.length() > 9)
+            commitId = commitId.substring(0, 9);
 
         return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d,%d,%d\n",
-                jarConfig.getCommitId().substring(0, 9),
+                commitId,
                 jarConfig.getJarFile().getName(),
                 jarConfig.getConfigId(),
                 projectRunResult.getProject().getName(),

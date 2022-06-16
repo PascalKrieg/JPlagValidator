@@ -11,7 +11,7 @@ import java.util.List;
 public class CSVJarResultFileBuilder {
     private final DecimalFormat formatter;
 
-    private final boolean skipTrueNegatives = false;
+    private static final boolean skipTrueNegatives = true;
 
     public CSVJarResultFileBuilder(DecimalFormat formatter) {
         this.formatter = formatter;
@@ -31,7 +31,7 @@ public class CSVJarResultFileBuilder {
     }
 
     private String buildJarResultTitleLine() {
-        return "first_submission,second_submission,similarity,minimal_similarity,maximal_similarity,type\n";
+        return "first_submission,second_submission,similarity,minimal_similarity,maximal_similarity,type,suspicious\n";
     }
 
     private String buildJarResultEntryLine(JPlagComparisonWrapper comparison, SubmissionPairType type) {
@@ -42,16 +42,17 @@ public class CSVJarResultFileBuilder {
         var firstSubmissionName = comparison.getFirstSubmissionName();
         var secondSubmissionName = comparison.getSecondSubmissionName();
 
-        if (skipTrueNegatives && type == SubmissionPairType.NO_PLAGIARISM
+        if (skipTrueNegatives && !comparison.isSuspicious() && type == SubmissionPairType.NO_PLAGIARISM
                 && Math.min(Math.min(comparison.getMinimalSimilarity(), comparison.getMaximalSimilarity()), comparison.getSimilarity()) < 0.01)
             return "";
 
-        return String.format("%s,%s,%s,%s,%s,%s\n",
+        return String.format("%s,%s,%s,%s,%s,%s,%s\n",
                 firstSubmissionName,
                 secondSubmissionName,
                 similarity,
                 minimalSimilarity,
                 maximalSimilarity,
-                type.toString());
+                type.toString(),
+                comparison.isSuspicious());
     }
 }
