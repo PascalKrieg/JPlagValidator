@@ -119,8 +119,20 @@ public class JPlagWrapper {
 
     private Object buildJPlagOptions(Path submissionPath, String language) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         var languageOption = buildLanguageOption(language);
-        var constructor = JPlagOptionsClass.getConstructor(String.class, JPlagLanguageOptionClass);
-        var optionsInstance = constructor.newInstance(submissionPath.toString(), languageOption);
+
+        Object optionsInstance;
+
+        // Very hacky way of trying different JPlag API versions
+        try {
+            var constructor = JPlagOptionsClass.getConstructor(List.class, List.class, JPlagLanguageOptionClass);
+            System.out.println("4.0.0 API");
+            optionsInstance = constructor.newInstance(List.of(submissionPath.toString()), List.of(), languageOption);
+        } catch (NoSuchMethodException e) {
+            // 3.0.0 API
+            var constructor = JPlagOptionsClass.getConstructor(String.class, JPlagLanguageOptionClass);
+            System.out.println("3.0.0 API");
+            optionsInstance = constructor.newInstance(submissionPath.toString(), languageOption);
+        }
 
         for (var setterContainer : configSettings) {
             var setter = setterContainer.getSetter();
