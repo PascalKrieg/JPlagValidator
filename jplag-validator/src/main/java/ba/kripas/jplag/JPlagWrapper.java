@@ -185,6 +185,12 @@ public class JPlagWrapper {
         var getSimilarity = JPlagComparisonClass.getMethod("similarity");
         var similarity = (float) getSimilarity.invoke(rawComparisonObject);
 
-        return new JPlagComparisonWrapper(firstSubmissionName, secondSubmissionName, maximalSimilarity, minimalSimilarity, similarity);
+        boolean isSuspicious = false;
+        try {
+            var getIsSuspicious = JPlagComparisonClass.getMethod("isSuspicious");
+            isSuspicious = (boolean) getIsSuspicious.invoke(rawComparisonObject);
+        } catch (NoSuchMethodException ignored) { }
+
+        return new JPlagComparisonWrapper(firstSubmissionName, secondSubmissionName, maximalSimilarity, minimalSimilarity, similarity, isSuspicious);
     }
 }

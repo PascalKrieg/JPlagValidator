@@ -90,7 +90,14 @@ public class JarRunEvaluator {
     }
 
     private void evaluateComparison(JPlagComparisonWrapper comparison, SubmissionPairType actualType, float threshold) {
-        if (comparison.getSimilarity() <= threshold) {
+        if (comparison.getSimilarity() > threshold || comparison.isSuspicious()) {
+            // Suspicious
+            if (actualType == SubmissionPairType.NO_PLAGIARISM) {
+                falsePositives++;
+            } else {
+                truePositives++;
+            }
+        } else {
             // Not suspicious
             if (actualType == SubmissionPairType.NO_PLAGIARISM) {
                 // Not Suspicious and is not plagiarism
@@ -98,13 +105,6 @@ public class JarRunEvaluator {
             } else {
                 // Not Suspicious and is not plagiarism
                 falseNegatives++;
-            }
-        } else {
-            // Suspicious
-            if (actualType == SubmissionPairType.NO_PLAGIARISM) {
-                falsePositives++;
-            } else {
-                truePositives++;
             }
         }
     }

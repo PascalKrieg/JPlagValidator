@@ -10,12 +10,15 @@ public class JPlagComparisonWrapper implements Comparable {
     private final float minimalSimilarity;
     private final float similarity;
 
-    public JPlagComparisonWrapper(String firstSubmissionName, String secondSubmissionName, float maximalSimilarity, float minimalSimilarity, float similarity) {
+    private final boolean isSuspicious;
+
+    public JPlagComparisonWrapper(String firstSubmissionName, String secondSubmissionName, float maximalSimilarity, float minimalSimilarity, float similarity, boolean suspicious) {
         this.firstSubmissionName = firstSubmissionName;
         this.secondSubmissionName = secondSubmissionName;
         this.maximalSimilarity = maximalSimilarity;
         this.minimalSimilarity = minimalSimilarity;
         this.similarity = similarity;
+        this.isSuspicious = suspicious;
     }
 
     public String getFirstSubmissionName() {
@@ -36,6 +39,10 @@ public class JPlagComparisonWrapper implements Comparable {
 
     public float getSimilarity() {
         return similarity;
+    }
+
+    public boolean isSuspicious() {
+        return isSuspicious;
     }
 
     @Override
