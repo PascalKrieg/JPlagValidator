@@ -2,23 +2,27 @@ package ba.kripas.evaluation;
 
 public class EvaluationMetrics {
     private final long runtime;
-    private final int truePositives;
     private final int falsePositives;
     private final int trueNegatives;
-    private final int falseNegatives;
+
+    private final int falseNegativesCommon;
+    private final int falseNegativesMossad;
+
+    private final int truePositivesCommon;
+    private final int truePositivesMossad;
 
     public long getRuntime() {
         return runtime;
     }
 
     public float getPrecision() {
-        if (truePositives + falsePositives == 0)
+        if (getTruePositives() + falsePositives == 0)
             return Float.POSITIVE_INFINITY;
-        return (float)truePositives / (truePositives + falsePositives);
+        return (float)getTruePositives() / (getTotalPositives() + falsePositives);
     }
 
     public float getRecall() {
-        return (float) truePositives / (truePositives + falseNegatives);
+        return (float) getTruePositives() / (getTruePositives() + getFalseNegatives());
     }
 
     public float getFMeasure() {
@@ -32,15 +36,15 @@ public class EvaluationMetrics {
     }
 
     public int getTotalPositives() {
-        return truePositives + falsePositives;
+        return getTruePositives() + falsePositives;
     }
 
     public int getTotalNegatives() {
-        return trueNegatives + falseNegatives;
+        return trueNegatives + getFalseNegatives();
     }
 
     public int getTruePositives() {
-        return truePositives;
+        return truePositivesCommon + truePositivesMossad;
     }
 
     public int getFalsePositives() {
@@ -52,7 +56,7 @@ public class EvaluationMetrics {
     }
 
     public int getFalseNegatives() {
-        return falseNegatives;
+        return falseNegativesCommon + falseNegativesMossad;
     }
 
     public float getTruePositiveRate() {
@@ -71,11 +75,33 @@ public class EvaluationMetrics {
         return (float) getFalseNegatives() / getTotalPositives();
     }
 
-    public EvaluationMetrics(long runtime, int truePositives, int falsePositives, int trueNegatives, int falseNegatives) {
+    public int getFalseNegativesCommon() {
+        return falseNegativesCommon;
+    }
+
+    public int getFalseNegativesMossad() {
+        return falseNegativesMossad;
+    }
+
+    public int getTruePositivesCommon() {
+        return truePositivesCommon;
+    }
+
+    public int getTruePositivesMossad() {
+        return truePositivesMossad;
+    }
+
+    public float getMossadDetectionRate() {
+        return (float)truePositivesMossad / (falseNegativesMossad + truePositivesMossad);
+    }
+
+    public EvaluationMetrics(long runtime, int falsePositives, int trueNegatives, int falseNegativesCommon, int falseNegativesMossad, int truePositivesCommon, int truePositivesMossad) {
         this.runtime = runtime;
-        this.truePositives = truePositives;
         this.falsePositives = falsePositives;
         this.trueNegatives = trueNegatives;
-        this.falseNegatives = falseNegatives;
+        this.falseNegativesCommon = falseNegativesCommon;
+        this.falseNegativesMossad = falseNegativesMossad;
+        this.truePositivesCommon = truePositivesCommon;
+        this.truePositivesMossad = truePositivesMossad;
     }
 }

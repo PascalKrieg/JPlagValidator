@@ -10,9 +10,13 @@ import java.util.List;
 
 public class JarRunEvaluator {
     private int falsePositives = 0;
-    private int falseNegatives = 0;
-    private int truePositives = 0;
     private int trueNegatives = 0;
+
+    private int falseNegativesCommon = 0;
+    private int falseNegativesMossad = 0;
+
+    private int truePositivesCommon = 0;
+    private int truePositivesMossad = 0;
 
     private int totalRuntime = 0;
 
@@ -61,14 +65,16 @@ public class JarRunEvaluator {
     }
 
     private EvaluationMetrics buildMetrics() {
-        return new EvaluationMetrics(totalRuntime, truePositives, falsePositives, trueNegatives, falseNegatives);
+        return new EvaluationMetrics(totalRuntime, falsePositives, trueNegatives, falseNegativesCommon, falseNegativesMossad, truePositivesCommon, truePositivesMossad);
     }
 
     private void resetValues() {
         falsePositives = 0;
-        falseNegatives = 0;
+        falseNegativesMossad = 0;
+        falseNegativesCommon = 0;
 
-        truePositives = 0;
+        truePositivesMossad = 0;
+        truePositivesCommon = 0;
         trueNegatives = 0;
 
         totalRuntime = 0;
@@ -92,19 +98,16 @@ public class JarRunEvaluator {
     private void evaluateComparison(JPlagComparisonWrapper comparison, SubmissionPairType actualType, float threshold) {
         if (comparison.getSimilarity() > threshold || comparison.isSuspicious()) {
             // Suspicious
-            if (actualType == SubmissionPairType.NO_PLAGIARISM) {
-                falsePositives++;
-            } else {
-                truePositives++;
+            switch (actualType) {
+                case NO_PLAGIARISM -> falsePositives++;
+                case COMMON_PLAG -> truePositivesCommon++;
+                default -> truePositivesMossad++;
             }
         } else {
-            // Not suspicious
-            if (actualType == SubmissionPairType.NO_PLAGIARISM) {
-                // Not Suspicious and is not plagiarism
-                trueNegatives++;
-            } else {
-                // Not Suspicious and is not plagiarism
-                falseNegatives++;
+            switch (actualType) {
+                case NO_PLAGIARISM -> trueNegatives++;
+                case COMMON_PLAG -> truePositivesCommon++;
+                default -> truePositivesMossad++;
             }
         }
     }
