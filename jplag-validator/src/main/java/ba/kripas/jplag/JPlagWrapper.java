@@ -22,17 +22,17 @@ public class JPlagWrapper {
     private Class<?> JPlagComparisonClass;
     private Class<?> SubmissionClass;
 
-    private List<ConfigSetterContainer> configSettings = new ArrayList<>();
+    private final List<ConfigSetterContainer> configSettings = new ArrayList<>();
 
     private final URL jarFile;
 
     public JPlagWrapper(JarConfig jarConfig) throws MalformedURLException, IncompatibleInterfaceException, InvalidOptionsException {
         this.jarFile = jarConfig.getJarFile().toURI().toURL();
-        Load();
-        LoadConfigSetters(jarConfig.getOptionsOverrides());
+        load();
+        loadConfigSetters(jarConfig.getOptionsOverrides());
     }
 
-    private void Load() throws IncompatibleInterfaceException {
+    private void load() throws IncompatibleInterfaceException {
         try {
             classLoader = new URLClassLoader(new URL[]{jarFile});
             JPlagOptionsClass = Class.forName("de.jplag.options.JPlagOptions", true, classLoader);
@@ -47,7 +47,7 @@ public class JPlagWrapper {
         }
     }
 
-    private void LoadConfigSetters(Collection<OptionsOverride> optionsOverrides) throws InvalidOptionsException {
+    private void loadConfigSetters(Collection<OptionsOverride> optionsOverrides) throws InvalidOptionsException {
         try {
             for (var override : optionsOverrides) {
 
@@ -125,12 +125,10 @@ public class JPlagWrapper {
         // Very hacky way of trying different JPlag API versions
         try {
             var constructor = JPlagOptionsClass.getConstructor(List.class, List.class, JPlagLanguageOptionClass);
-            System.out.println("4.0.0 API");
             optionsInstance = constructor.newInstance(List.of(submissionPath.toString()), List.of(), languageOption);
         } catch (NoSuchMethodException e) {
             // 3.0.0 API
             var constructor = JPlagOptionsClass.getConstructor(String.class, JPlagLanguageOptionClass);
-            System.out.println("3.0.0 API");
             optionsInstance = constructor.newInstance(submissionPath.toString(), languageOption);
         }
 

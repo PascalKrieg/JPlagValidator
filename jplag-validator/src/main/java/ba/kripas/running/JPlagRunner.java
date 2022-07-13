@@ -36,7 +36,7 @@ public class JPlagRunner {
     }
 
     public static JarRunResult RunJar(JarConfig jarConfig, List<Project> projects) throws MalformedURLException, IncompatibleInterfaceException, InvalidOptionsException {
-        logger.info("Running: " + jarConfig.getJarFile().getName() + "-" + jarConfig.getConfigId());
+        logger.info("Now Running Jar: " + jarConfig.getJarFile().getName() + " - " + jarConfig.getConfigId());
 
         var jPlag = new JPlagWrapper(jarConfig);
 
@@ -44,6 +44,7 @@ public class JPlagRunner {
         List<Project> errorProjects = new ArrayList<>();
 
         for (var project : projects) {
+            logger.info("Project: " + project.getName());
             try {
                 var resultWrapper = jPlag.run(project);
                 var runResult = new ProjectRunResult(jarConfig, project, resultWrapper);

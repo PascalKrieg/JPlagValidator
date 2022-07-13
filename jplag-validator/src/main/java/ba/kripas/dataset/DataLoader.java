@@ -67,8 +67,7 @@ public class DataLoader implements IDataLoader {
     }
 
     private List<SubmissionPair> parseTruthFile(File truthFile) throws IOException {
-        BufferedReader reader;
-        reader = new BufferedReader(new FileReader(truthFile));
+        BufferedReader reader = new BufferedReader(new FileReader(truthFile));
 
         var currentPairs = new LinkedList<SubmissionPair>();
         var currentType = SubmissionPairType.NO_PLAGIARISM;

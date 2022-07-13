@@ -24,7 +24,7 @@ public class CSVJarResultFileBuilder {
     public String buildJarResultContent(Project project, List<JPlagComparisonWrapper> comparisons) {
         StringBuilder sb = new StringBuilder(buildJarResultTitleLine());
         comparisons.forEach(comparison -> {
-            var actualType = project.GetPairType(comparison.getFirstSubmissionName(), comparison.getSecondSubmissionName());
+            var actualType = project.getPairType(comparison.getFirstSubmissionName(), comparison.getSecondSubmissionName());
             sb.append(buildJarResultEntryLine(comparison, actualType));
         });
         return sb.toString();

@@ -22,7 +22,7 @@ public class CSVResultWriter implements IResultWriter {
     public void writeResult(Summary summary) {
         try {
             Path filePath = FileSystems.getDefault().getPath(targetPath, buildFileName());
-            System.out.println("Target result file: " + filePath.toString());
+            System.out.println("Target result file: " + filePath);
             FileWriter writer = new FileWriter(filePath.toFile());
             writer.write(buildFileContent(summary));
             writer.flush();
@@ -37,7 +37,7 @@ public class CSVResultWriter implements IResultWriter {
             jarRunResult.getProjectResult().forEach(projectRunResult -> {
                 projectRunResult.getComparisons().forEach(comparison -> {
                     var project = projectRunResult.getProject();
-                    var actualType = project.GetPairType(comparison.getFirstSubmissionName(), comparison.getSecondSubmissionName());
+                    var actualType = project.getPairType(comparison.getFirstSubmissionName(), comparison.getSecondSubmissionName());
                     sb.append(buildEntryLine(comparison, actualType, project.getName(), jarRunResult.getConfig()));
                 });
             });

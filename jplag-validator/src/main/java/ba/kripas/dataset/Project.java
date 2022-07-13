@@ -27,16 +27,17 @@ public class Project {
         this.name = name;
         this.path = path;
         this.language = language;
-        pairMap = new HashMap<>();
+        this.pairMap = new HashMap<>();
         submissionPairs.forEach(submissionPair -> {
             pairMap.put(buildKey(submissionPair), submissionPair.getType());
         });
     }
 
-    public SubmissionPairType GetPairType(String first, String second) {
+    public SubmissionPairType getPairType(String first, String second) {
         var key = buildKey(first, second);
-        if (!pairMap.containsKey(key))
+        if (!pairMap.containsKey(key)) {
             return SubmissionPairType.NO_PLAGIARISM;
+        }
 
         return pairMap.get(key);
     }
