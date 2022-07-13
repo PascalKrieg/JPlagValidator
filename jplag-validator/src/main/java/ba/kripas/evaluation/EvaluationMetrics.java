@@ -1,7 +1,12 @@
 package ba.kripas.evaluation;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
 public class EvaluationMetrics {
-    private final long runtime;
+    DescriptiveStatistics noPlagiarismStatistics;
+    DescriptiveStatistics commonPlagStatistics;
+    DescriptiveStatistics mossadStatistics;
+
     private final int falsePositives;
     private final int trueNegatives;
 
@@ -11,8 +16,30 @@ public class EvaluationMetrics {
     private final int truePositivesCommon;
     private final int truePositivesMossad;
 
-    public long getRuntime() {
-        return runtime;
+    public EvaluationMetrics(DescriptiveStatistics noPlagiarismStats, DescriptiveStatistics commonPlagStats, DescriptiveStatistics mossadStats,
+                             int falsePositives, int trueNegatives, int falseNegativesCommon,
+                             int falseNegativesMossad, int truePositivesCommon, int truePositivesMossad) {
+        this.noPlagiarismStatistics = noPlagiarismStats;
+        this.commonPlagStatistics = commonPlagStats;
+        this.mossadStatistics = mossadStats;
+        this.falsePositives = falsePositives;
+        this.trueNegatives = trueNegatives;
+        this.falseNegativesCommon = falseNegativesCommon;
+        this.falseNegativesMossad = falseNegativesMossad;
+        this.truePositivesCommon = truePositivesCommon;
+        this.truePositivesMossad = truePositivesMossad;
+    }
+
+    public DescriptiveStatistics getNoPlagiarismStatistics() {
+        return noPlagiarismStatistics;
+    }
+
+    public DescriptiveStatistics getCommonPlagStatistics() {
+        return commonPlagStatistics;
+    }
+
+    public DescriptiveStatistics getMossadStatistics() {
+        return mossadStatistics;
     }
 
     public float getPrecision() {
@@ -92,16 +119,8 @@ public class EvaluationMetrics {
     }
 
     public float getMossadDetectionRate() {
-        return (float)truePositivesMossad / (falseNegativesMossad + truePositivesMossad);
+        return (float)truePositivesMossad / (float) (falseNegativesMossad + truePositivesMossad);
     }
 
-    public EvaluationMetrics(long runtime, int falsePositives, int trueNegatives, int falseNegativesCommon, int falseNegativesMossad, int truePositivesCommon, int truePositivesMossad) {
-        this.runtime = runtime;
-        this.falsePositives = falsePositives;
-        this.trueNegatives = trueNegatives;
-        this.falseNegativesCommon = falseNegativesCommon;
-        this.falseNegativesMossad = falseNegativesMossad;
-        this.truePositivesCommon = truePositivesCommon;
-        this.truePositivesMossad = truePositivesMossad;
-    }
+
 }

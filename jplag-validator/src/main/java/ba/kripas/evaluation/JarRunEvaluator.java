@@ -2,8 +2,9 @@ package ba.kripas.evaluation;
 
 import ba.kripas.dataset.SubmissionPairType;
 import ba.kripas.jplag.JPlagComparisonWrapper;
-import ba.kripas.running.JarRunResult;
 import ba.kripas.running.ProjectRunResult;
+
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +33,25 @@ public class JarRunEvaluator {
         resetValues();
 
         processProject(projectResult, threshold);
+        var noPlagiarismStats = getStatistics(projectResult, SubmissionPairType.NO_PLAGIARISM);
+        var mossadStats = getStatistics(projectResult, SubmissionPairType.MOSSAD_PLAG);
+        var commonPlagStats = getStatistics(projectResult, SubmissionPairType.COMMON_PLAG);
 
-        return buildMetrics();
+        return buildMetrics(noPlagiarismStats, commonPlagStats, mossadStats);
+    }
+
+    private DescriptiveStatistics getStatistics(ProjectRunResult projectResult, SubmissionPairType type) {
+        var project = projectResult.getProject();
+
+        var statistics = new DescriptiveStatistics();
+
+        projectResult.getComparisons()
+                .stream()
+                .filter(comparison -> project.getPairType(comparison.getFirstSubmissionName(), comparison.getSecondSubmissionName()) == type)
+                .mapToDouble(JPlagComparisonWrapper::getSimilarity)
+                .forEach(statistics::addValue);
+
+        return statistics;
     }
 
     public EvaluationMetrics getForPercentile(ProjectRunResult projectResult, float percentile) {
@@ -42,30 +60,17 @@ public class JarRunEvaluator {
         var threshold = calculatePercentile(projectResult, percentile);
         processProject(projectResult, threshold);
 
-        return buildMetrics();
+        var noPlagiarismStats = getStatistics(projectResult, SubmissionPairType.NO_PLAGIARISM);
+        var mossadStats = getStatistics(projectResult, SubmissionPairType.MOSSAD_PLAG);
+        var commonPlagStats = getStatistics(projectResult, SubmissionPairType.COMMON_PLAG);
+
+        return buildMetrics(noPlagiarismStats, commonPlagStats, mossadStats);
     }
 
-    public EvaluationMetrics getForThreshold(JarRunResult result, float threshold) {
-        resetValues();
-
-        for (var projectResult : result.getProjectResult()) {
-            processProject(projectResult, threshold);
-        }
-        return buildMetrics();
-    }
-
-    public EvaluationMetrics getForPercentile(JarRunResult result, float percentile) {
-        resetValues();
-
-        for (var projectResult : result.getProjectResult()) {
-            var threshold = calculatePercentile(projectResult, percentile);
-            processProject(projectResult, threshold);
-        }
-        return buildMetrics();
-    }
-
-    private EvaluationMetrics buildMetrics() {
-        return new EvaluationMetrics(totalRuntime, falsePositives, trueNegatives, falseNegativesCommon, falseNegativesMossad, truePositivesCommon, truePositivesMossad);
+    private EvaluationMetrics buildMetrics(DescriptiveStatistics noPlagiarismStats, DescriptiveStatistics commonPlagStats, DescriptiveStatistics mossadStats) {
+        return new EvaluationMetrics(noPlagiarismStats, commonPlagStats, mossadStats,
+                falsePositives, trueNegatives, falseNegativesCommon, falseNegativesMossad,
+                truePositivesCommon, truePositivesMossad);
     }
 
     private void resetValues() {
@@ -81,12 +86,12 @@ public class JarRunEvaluator {
     }
 
     private void processProject(ProjectRunResult projectResult, float threshold) {
-        totalRuntime += projectResult.getRuntimeInMillis();
+        totalRuntime += projectResult.getActualRuntimeInMillis();
 
         var project = projectResult.getProject();
 
         for (var comparison : projectResult.getComparisons()) {
-            var actualType = project.GetPairType(comparison.getFirstSubmissionName(), comparison.getSecondSubmissionName());
+            var actualType = project.getPairType(comparison.getFirstSubmissionName(), comparison.getSecondSubmissionName());
 
             if (excludedPairTypes.contains(actualType))
                 continue;

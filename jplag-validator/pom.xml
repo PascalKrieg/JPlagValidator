@@ -32,6 +32,11 @@
       <version>20220320</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math3</artifactId>
+      <version>3.6.1</version>
+    </dependency>
 
   </dependencies>
 
@@ -131,6 +136,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <release>14</release>
+          <source>16</source>
+          <target>16</target>
         </configuration>
       </plugin>
     </plugins>

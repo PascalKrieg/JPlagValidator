@@ -103,9 +103,12 @@ public class JPlagWrapper {
             var JPlagObject = buildJPlag(projectPath, languageString);
 
             var runMethod = JPlagClass.getMethod("run");
-            var JPlagResult = runMethod.invoke(JPlagObject);
 
-            return buildResult(JPlagResult);
+            var timeBeforeRunning = System.currentTimeMillis();
+            var JPlagResult = runMethod.invoke(JPlagObject);
+            var actualDuration = System.currentTimeMillis() - timeBeforeRunning;
+
+            return buildResult(JPlagResult, actualDuration);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | InstantiationException e) {
             e.printStackTrace();
             throw new IncompatibleInterfaceException();
@@ -145,7 +148,7 @@ public class JPlagWrapper {
         return Enum.valueOf((Class<Enum>) JPlagLanguageOptionClass, language);
     }
 
-    private JPlagResultWrapper buildResult(Object rawResultObject) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private JPlagResultWrapper buildResult(Object rawResultObject, long actualDuration) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         var getDurationMethod = JPlagResultClass.getMethod("getDuration");
         var getNumberOfSubmissionsMethod = JPlagResultClass.getMethod("getNumberOfSubmissions");
         var getComparisonsMethod = JPlagResultClass.getMethod("getComparisons");
@@ -160,7 +163,7 @@ public class JPlagWrapper {
             comparisons.add(buildComparisonObject(rawComparison));
         }
 
-        return new JPlagResultWrapper(comparisons, duration, numberOfSubmissions);
+        return new JPlagResultWrapper(comparisons, duration, actualDuration, numberOfSubmissions);
     }
 
     private JPlagComparisonWrapper buildComparisonObject(Object rawComparisonObject) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {

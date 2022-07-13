@@ -34,30 +34,40 @@ public class CSVSummaryFileBuilder {
     }
 
     private String buildTitleLine() {
-        return "commit,jar_file,config_id,project,submissions,runtime,precision,recall,f_measure,balanced_accuracy,mossad_detection,true_positives,true_negatives,false_positives,false_negatives\n";
+        return "commit,jar_file,config_id,project,submissions,runtime_jplag,runtime_actual," +
+                "precision,recall,f_measure,balanced_accuracy,mossad_detection," +
+                "no_plag_mean,no_plag_median,common_mean,common_median,mossad_mean,mossad_median," +
+                "true_positives,true_negatives,false_positives,false_negatives\n";
     }
 
     private String buildEntryLine(JarConfig jarConfig, ProjectRunResult projectRunResult) {
         //var evaluation = evaluator.getForThreshold(projectRunResult, 30f);
-        var evaluation = evaluator.getForThreshold(projectRunResult, 80f);
+        var evaluation = evaluator.getForThreshold(projectRunResult, 40f);
 
         var commitId = jarConfig.getCommitId();
 
         if (commitId.length() > 9)
             commitId = commitId.substring(0, 9);
 
-        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d,%d,%d\n",
+        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d,%d,%d\n",
                 commitId,
                 jarConfig.getJarFile().getName(),
                 jarConfig.getConfigId(),
                 projectRunResult.getProject().getName(),
                 projectRunResult.getSubmissions(),
-                projectRunResult.getRuntimeInMillis(),
+                projectRunResult.getJPlagRuntimeInMillis(),
+                projectRunResult.getActualRuntimeInMillis(),
                 formatter.format(evaluation.getPrecision()),
                 formatter.format(evaluation.getRecall()),
                 formatter.format(evaluation.getFMeasure()),
                 formatter.format(evaluation.getBalancedAccuracy()),
                 formatter.format(evaluation.getMossadDetectionRate()),
+                formatter.format(evaluation.getNoPlagiarismStatistics().getMean()),
+                formatter.format(evaluation.getNoPlagiarismStatistics().getPercentile(50)),
+                formatter.format(evaluation.getCommonPlagStatistics().getMean()),
+                formatter.format(evaluation.getCommonPlagStatistics().getPercentile(50)),
+                formatter.format(evaluation.getMossadStatistics().getMean()),
+                formatter.format(evaluation.getMossadStatistics().getPercentile(50)),
                 evaluation.getTruePositives(),
                 evaluation.getTrueNegatives(),
                 evaluation.getFalsePositives(),
