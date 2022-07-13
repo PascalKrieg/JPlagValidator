@@ -1,7 +1,5 @@
 package ba.kripas.jplag;
 
-import java.util.Objects;
-
 public class JPlagComparisonWrapper implements Comparable {
     private final String firstSubmissionName;
     private final String secondSubmissionName;

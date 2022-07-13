@@ -1,8 +1,5 @@
 package ba.kripas.jplag;
 
-import java.lang.reflect.Type;
-import java.util.List;
-
 public class OptionsOverride {
     private final String setter;
     private final String type;

@@ -1,7 +1,5 @@
 package ba.kripas.running;
 
-import ba.kripas.running.JarRunResult;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
