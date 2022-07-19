@@ -39,13 +39,22 @@ public class MultiCSVSummaryWriter implements IResultWriter {
 
     private void writeFiles(Summary summary, File parentDirectory) {
         writeJarRunFiles(summary, parentDirectory);
-        writeSummaryFile(summary, parentDirectory);
+        writeFullSummary(summary, parentDirectory);
+        //writeShortSummary(summary, parentDirectory); // disabled until the issue with NaN and infinity messing up the average is resolved
     }
 
-    private void writeSummaryFile(Summary summary, File parentDirectory) {
+    private void writeFullSummary(Summary summary, File parentDirectory) {
         var summaryFileBuilder = new CSVSummaryFileBuilder(formatter);
         var fileName = summaryFileBuilder.buildFileName();
-        var content = summaryFileBuilder.buildContent(summary);
+        var content = summaryFileBuilder.buildFullContent(summary);
+
+        writeSingleFile(new File(parentDirectory, fileName), content);
+    }
+
+    private void writeShortSummary(Summary summary, File parentDirectory) {
+        var summaryFileBuilder = new CSVSummaryFileBuilder(formatter);
+        var fileName = "summary-weighted.csv";
+        var content = summaryFileBuilder.buildSummarizedContent(summary);
 
         writeSingleFile(new File(parentDirectory, fileName), content);
     }

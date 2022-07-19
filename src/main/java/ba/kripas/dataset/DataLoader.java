@@ -3,6 +3,8 @@ package ba.kripas.dataset;
 import ba.kripas.jplag.OptionsOverride;
 import ba.kripas.running.JarConfig;
 import ba.kripas.running.RunningConfig;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -20,6 +22,8 @@ public class DataLoader implements IDataLoader {
     private static final String CONFIG_FILE_NAME = "config.json";
     private static final String TRUTH_ENDING = "-truth.txt";
 
+    public static final String CONFIG_ID_KEY = "config_id";
+
     private final String datasetRootPath;
     private final String jarRootPath;
 
@@ -29,7 +33,7 @@ public class DataLoader implements IDataLoader {
     }
 
     @Override
-    public RunningConfig LoadConfig() throws IOException {
+    public RunningConfig loadConfig() throws IOException {
         var jarConfigs = loadJarConfigs();
         var projects = loadProjects();
 
@@ -130,21 +134,34 @@ public class DataLoader implements IDataLoader {
     }
 
     private Collection<JarConfig> buildConfigsForJar(JSONObject jarEntry) {
+        if (jarEntry.has("skip")) {
+            return new LinkedList<>();
+        }
+
         var jarFileName = jarEntry.getString("file");
         var jarFile = new File(jarRootPath, jarFileName);
-        var commitId = jarEntry.getString("commit");
+
+        var commitId = "unknown";
+        if (jarEntry.has("commit")) {
+            commitId = jarEntry.getString("commit");
+        }
 
         var configs = new LinkedList<JarConfig>();
 
-        var configsJSONArray = jarEntry.getJSONArray("configs");
+        JSONArray configsJSONArray;
 
-        if (configsJSONArray.isEmpty()) {
+        if (!jarEntry.has("configs") || jarEntry.getJSONArray("configs").isEmpty()) {
             configs.add(new JarConfig(jarFile, commitId, "default", new ArrayList<>()));
+            return configs;
         }
+
+        configsJSONArray = jarEntry.getJSONArray("configs");
 
         // Read every config for one jar file
         for (var configJSONObject : configsJSONArray) {
-
+            if (((JSONObject)configJSONObject).has("skip")) {
+                continue;
+            }
             var config = buildJarConfig(jarFile, commitId, (JSONObject) configJSONObject);
             configs.add(config);
         }
@@ -153,20 +170,31 @@ public class DataLoader implements IDataLoader {
     }
 
     private JarConfig buildJarConfig(File jarFile, String commitId, JSONObject configJSONObject) {
-        var configId = configJSONObject.getString("config_id");
+        String configId;
+        if (configJSONObject.has(CONFIG_ID_KEY)) {
+           configId = configJSONObject.getString("config_id");
+        } else {
+            configId = "unknown";
+        }
+
         var optionsJSONArray = configJSONObject.getJSONArray("options");
 
         var optionsOverrides = new LinkedList<OptionsOverride>();
 
         for (var optionJSonObject : optionsJSONArray) {
             var option = (JSONObject) optionJSonObject;
-            optionsOverrides.add(buildOptionsEntry(option));
+            try {
+                var optionsEntry = buildOptionsEntry(option);
+                optionsOverrides.add(optionsEntry);
+            } catch (JSONException e) {
+                // TODO log invalid options entry
+            }
         }
 
         return new JarConfig(jarFile, commitId, configId, optionsOverrides);
     }
 
-    private OptionsOverride buildOptionsEntry(JSONObject optionsEntry) {
+    private OptionsOverride buildOptionsEntry(JSONObject optionsEntry) throws JSONException {
         var setterName = optionsEntry.getString("setter");
         var type = optionsEntry.getString("type");
         var value = optionsEntry.getString("value");
