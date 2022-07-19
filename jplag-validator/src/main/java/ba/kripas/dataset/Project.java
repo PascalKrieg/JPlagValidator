@@ -48,8 +48,9 @@ public class Project {
 
     private static String buildKey(String firstSubmission, String secondSubmission) {
         var comparison = firstSubmission.compareTo(secondSubmission);
-        if (comparison == 0)
+        if (comparison == 0) {
             throw new IllegalArgumentException("Tried to create submission pair between the same submission or duplicate submission name in dataset");
+        }
 
         if (comparison < 0) {
             return firstSubmission + secondSubmission;

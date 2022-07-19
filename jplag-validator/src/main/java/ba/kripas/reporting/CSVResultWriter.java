@@ -37,7 +37,8 @@ public class CSVResultWriter implements IResultWriter {
             jarRunResult.getProjectResult().forEach(projectRunResult -> {
                 projectRunResult.getComparisons().forEach(comparison -> {
                     var project = projectRunResult.getProject();
-                    var actualType = project.getPairType(comparison.getFirstSubmissionName(), comparison.getSecondSubmissionName());
+                    var actualType = project.getPairType(comparison.getFirstSubmissionName(),
+                            comparison.getSecondSubmissionName());
                     sb.append(buildEntryLine(comparison, actualType, project.getName(), jarRunResult.getConfig()));
                 });
             });
@@ -51,7 +52,8 @@ public class CSVResultWriter implements IResultWriter {
     }
 
     private String buildTitleLine() {
-        return "jar_file,commit,project,first_submission,second_submission,similarity,minimal_similarity,maximal_similarity,type\n";
+        return "jar_file,commit,project,first_submission,second_submission,similarity,minimal_similarity,"
+                + "maximal_similarity,type\n";
     }
 
     private String buildEntryLine(JPlagComparisonWrapper comparison, SubmissionPairType type, String projectName, JarConfig jarConfig) {
@@ -65,8 +67,9 @@ public class CSVResultWriter implements IResultWriter {
 
         var commit = jarConfig.getCommitId().substring(0, 6);
 
-        if (Math.min(Math.min(minimalSimilarity, maximalSimilarity), similarity) < 0.01 && type == SubmissionPairType.NO_PLAGIARISM)
+        if (Math.min(Math.min(minimalSimilarity, maximalSimilarity), similarity) < 0.01 && type == SubmissionPairType.NO_PLAGIARISM) {
             return "";
+        }
 
         return String.format("%s,%s,%s,%s,%s,%.2f,%.2f,%.2f,%s\n",
                 jarName,

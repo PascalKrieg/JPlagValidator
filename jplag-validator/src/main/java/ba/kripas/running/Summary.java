@@ -27,7 +27,7 @@ public class Summary {
         this.jarResults = jarResults;
     }
 
-    public void AddRunResult(JarRunResult runResult) {
+    public void addRunResult(JarRunResult runResult) {
         jarResults.add(runResult);
     }
 

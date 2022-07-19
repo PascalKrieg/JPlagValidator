@@ -8,7 +8,8 @@ public class JPlagResultWrapper {
     private final long actualDurationInMillis;
     private final int numberOfSubmissions;
 
-    public JPlagResultWrapper(List<JPlagComparisonWrapper> comparisons, long jplagDurationInMillis, long actualDurationInMillis, int numberOfSubmissions) {
+    public JPlagResultWrapper(List<JPlagComparisonWrapper> comparisons, long jplagDurationInMillis,
+                              long actualDurationInMillis, int numberOfSubmissions) {
         this.comparisons = comparisons;
         this.jplagDurationInMillis = jplagDurationInMillis;
         this.actualDurationInMillis = actualDurationInMillis;

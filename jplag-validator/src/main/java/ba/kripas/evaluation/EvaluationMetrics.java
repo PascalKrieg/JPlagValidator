@@ -3,9 +3,9 @@ package ba.kripas.evaluation;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class EvaluationMetrics {
-    DescriptiveStatistics noPlagiarismStatistics;
-    DescriptiveStatistics commonPlagStatistics;
-    DescriptiveStatistics mossadStatistics;
+    private final DescriptiveStatistics noPlagiarismStatistics;
+    private final DescriptiveStatistics commonPlagStatistics;
+    private final DescriptiveStatistics mossadStatistics;
 
     private final int falsePositives;
     private final int trueNegatives;
@@ -16,9 +16,10 @@ public class EvaluationMetrics {
     private final int truePositivesCommon;
     private final int truePositivesMossad;
 
-    public EvaluationMetrics(DescriptiveStatistics noPlagiarismStats, DescriptiveStatistics commonPlagStats, DescriptiveStatistics mossadStats,
-                             int falsePositives, int trueNegatives, int falseNegativesCommon,
-                             int falseNegativesMossad, int truePositivesCommon, int truePositivesMossad) {
+    public EvaluationMetrics(DescriptiveStatistics noPlagiarismStats, DescriptiveStatistics commonPlagStats,
+                             DescriptiveStatistics mossadStats, int falsePositives, int trueNegatives,
+                             int falseNegativesCommon, int falseNegativesMossad,
+                             int truePositivesCommon, int truePositivesMossad) {
         this.noPlagiarismStatistics = noPlagiarismStats;
         this.commonPlagStatistics = commonPlagStats;
         this.mossadStatistics = mossadStats;
@@ -43,9 +44,10 @@ public class EvaluationMetrics {
     }
 
     public float getPrecision() {
-        if (getTruePositives() + falsePositives == 0)
+        if (getTruePositives() + falsePositives == 0) {
             return Float.POSITIVE_INFINITY;
-        return (float)getTruePositives() / (getTotalPositives() + falsePositives);
+        }
+        return (float) getTruePositives() / (getTotalPositives() + falsePositives);
     }
 
     public float getRecall() {
@@ -87,11 +89,11 @@ public class EvaluationMetrics {
     }
 
     public float getTruePositiveRate() {
-        return (float)getTruePositives() / getTotalPositives();
+        return (float) getTruePositives() / getTotalPositives();
     }
 
     public float getTrueNegativeRate() {
-        return (float)getTrueNegatives() / getTotalNegatives();
+        return (float) getTrueNegatives() / getTotalNegatives();
     }
 
     public float getFalsePositiveRate() {
@@ -119,7 +121,7 @@ public class EvaluationMetrics {
     }
 
     public float getMossadDetectionRate() {
-        return (float)truePositivesMossad / (float) (falseNegativesMossad + truePositivesMossad);
+        return (float) truePositivesMossad / (float) (falseNegativesMossad + truePositivesMossad);
     }
 
 

@@ -20,13 +20,14 @@ public class JPlagWrapper {
     private Class<?> JPlagClass;
     private Class<?> JPlagResultClass;
     private Class<?> JPlagComparisonClass;
-    private Class<?> SubmissionClass;
+    private Class<?> submissionClass;
 
     private final List<ConfigSetterContainer> configSettings = new ArrayList<>();
 
     private final URL jarFile;
 
-    public JPlagWrapper(JarConfig jarConfig) throws MalformedURLException, IncompatibleInterfaceException, InvalidOptionsException {
+    public JPlagWrapper(JarConfig jarConfig) throws MalformedURLException, IncompatibleInterfaceException,
+            InvalidOptionsException {
         this.jarFile = jarConfig.getJarFile().toURI().toURL();
         load();
         loadConfigSetters(jarConfig.getOptionsOverrides());
@@ -40,7 +41,7 @@ public class JPlagWrapper {
             JPlagClass = Class.forName("de.jplag.JPlag", true, classLoader);
             JPlagResultClass = Class.forName("de.jplag.JPlagResult", true, classLoader);
             JPlagComparisonClass = Class.forName("de.jplag.JPlagComparison", true, classLoader);
-            SubmissionClass = Class.forName("de.jplag.Submission", true, classLoader);
+            submissionClass = Class.forName("de.jplag.Submission", true, classLoader);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             throw new IncompatibleInterfaceException();
@@ -75,16 +76,19 @@ public class JPlagWrapper {
                     return Float.parseFloat(value);
                 case "bool":
                 case "boolean":
-                    return Boolean.parseBoolean(value); // Note: every value other than "true" is returned as false, even if it is not a bool
+                    return Boolean.parseBoolean(value);
+                    // Note: every value other than "true" is returned as false, even if it is not a bool
+                default:
             }
         } catch (NumberFormatException e) {
             throw new InvalidOptionsException("Invalid Options: Cannot parse " + type + " (" + value + ")");
         }
 
-        if (!type.toLowerCase().startsWith("enum:"))
+        if (!type.toLowerCase().startsWith("enum:")) {
             throw new InvalidOptionsException("Unknown type: " + type);
+        }
 
-        var enumType = type.substring(5, type.length());
+        var enumType = type.substring(5);
         try {
             var enumClass = Class.forName(enumType, true, classLoader);
             return Enum.valueOf((Class<Enum>) enumClass, value);
@@ -115,14 +119,16 @@ public class JPlagWrapper {
         }
     }
 
-    private Object buildJPlag(Path submissionPath, String language) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    private Object buildJPlag(Path submissionPath, String language) throws ClassNotFoundException,
+            InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Object JPlagOptions = buildJPlagOptions(submissionPath, language);
         return JPlagClass.getConstructor(JPlagOptionsClass).newInstance(JPlagOptions);
     }
 
-    private Object buildJPlagOptions(Path submissionPath, String language) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        var languageOption = buildLanguageOption(language);
+    private Object buildJPlagOptions(Path submissionPath, String language) throws NoSuchMethodException,
+            InvocationTargetException, InstantiationException, IllegalAccessException {
 
+        var languageOption = buildLanguageOption(language);
         Object optionsInstance;
 
         // Very hacky way of trying different JPlag API versions
@@ -148,7 +154,9 @@ public class JPlagWrapper {
         return Enum.valueOf((Class<Enum>) JPlagLanguageOptionClass, language);
     }
 
-    private JPlagResultWrapper buildResult(Object rawResultObject, long actualDuration) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private JPlagResultWrapper buildResult(Object rawResultObject, long actualDuration) throws NoSuchMethodException,
+            InvocationTargetException, IllegalAccessException {
+
         var getDurationMethod = JPlagResultClass.getMethod("getDuration");
         var getNumberOfSubmissionsMethod = JPlagResultClass.getMethod("getNumberOfSubmissions");
         var getComparisonsMethod = JPlagResultClass.getMethod("getComparisons");
@@ -166,8 +174,10 @@ public class JPlagWrapper {
         return new JPlagResultWrapper(comparisons, duration, actualDuration, numberOfSubmissions);
     }
 
-    private JPlagComparisonWrapper buildComparisonObject(Object rawComparisonObject) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        var getSubmissionName = SubmissionClass.getMethod("getName");
+    private JPlagComparisonWrapper buildComparisonObject(Object rawComparisonObject) throws NoSuchMethodException,
+            InvocationTargetException, IllegalAccessException {
+
+        var getSubmissionName = submissionClass.getMethod("getName");
 
         var getFirstSubmission = JPlagComparisonClass.getMethod("getFirstSubmission");
         var firstSubmission = getFirstSubmission.invoke(rawComparisonObject);
@@ -192,6 +202,7 @@ public class JPlagWrapper {
             isSuspicious = (boolean) getIsSuspicious.invoke(rawComparisonObject);
         } catch (NoSuchMethodException ignored) { }
 
-        return new JPlagComparisonWrapper(firstSubmissionName, secondSubmissionName, maximalSimilarity, minimalSimilarity, similarity, isSuspicious);
+        return new JPlagComparisonWrapper(firstSubmissionName, secondSubmissionName, maximalSimilarity,
+                minimalSimilarity, similarity, isSuspicious);
     }
 }

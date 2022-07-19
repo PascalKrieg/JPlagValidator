@@ -2,7 +2,6 @@ package ba.kripas.running;
 
 import ba.kripas.dataset.Project;
 
-
 import java.util.List;
 
 public class RunningConfig {

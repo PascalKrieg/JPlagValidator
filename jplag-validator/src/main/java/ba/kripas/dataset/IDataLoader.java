@@ -6,6 +6,6 @@ import java.io.IOException;
 
 public interface IDataLoader {
 
-    RunningConfig LoadConfig() throws IOException;
+    RunningConfig loadConfig() throws IOException;
 
 }

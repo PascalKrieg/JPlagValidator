@@ -34,10 +34,10 @@ public class CSVSummaryFileBuilder {
     }
 
     private String buildTitleLine() {
-        return "commit,jar_file,config_id,project,submissions,runtime_jplag,runtime_actual," +
-                "precision,recall,f_measure,balanced_accuracy,mossad_detection," +
-                "no_plag_mean,no_plag_median,common_mean,common_median,mossad_mean,mossad_median," +
-                "true_positives,true_negatives,false_positives,false_negatives\n";
+        return "commit,jar_file,config_id,project,submissions,runtime_jplag,runtime_actual," 
+                + "precision,recall,f_measure,balanced_accuracy,mossad_detection," 
+                + "no_plag_mean,no_plag_median,common_mean,common_median,mossad_mean,mossad_median," 
+                + "true_positives,true_negatives,false_positives,false_negatives\n";
     }
 
     private String buildEntryLine(JarConfig jarConfig, ProjectRunResult projectRunResult) {
@@ -46,15 +46,17 @@ public class CSVSummaryFileBuilder {
 
         var commitId = jarConfig.getCommitId();
 
-        if (commitId.length() > 9)
+        if (commitId.length() > 9) {
             commitId = commitId.substring(0, 9);
+        }
+
 
         return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d,%d,%d\n",
                 commitId,
                 jarConfig.getJarFile().getName(),
                 jarConfig.getConfigId(),
                 projectRunResult.getProject().getName(),
-                projectRunResult.getSubmissions(),
+                projectRunResult.getSubmissionCount(),
                 projectRunResult.getJPlagRuntimeInMillis(),
                 projectRunResult.getActualRuntimeInMillis(),
                 formatter.format(evaluation.getPrecision()),

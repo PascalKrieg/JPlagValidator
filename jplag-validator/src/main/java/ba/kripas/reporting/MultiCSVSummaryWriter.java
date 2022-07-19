@@ -51,12 +51,12 @@ public class MultiCSVSummaryWriter implements IResultWriter {
     }
 
     private void writeJarRunFiles(Summary summary, File parentDirectory) {
-        var JarResultBuilder = new CSVJarResultFileBuilder(formatter);
+        var jarResultBuilder = new CSVJarResultFileBuilder(formatter);
 
         summary.getJarResults().forEach(jarRunResult -> {
             jarRunResult.getProjectResult().forEach(projectRunResult -> {
-                var fileName = JarResultBuilder.buildJarResultFileName(jarRunResult.getConfig(), projectRunResult.getProject());
-                var content = JarResultBuilder.buildJarResultContent(projectRunResult.getProject(), projectRunResult.getComparisons());
+                var fileName = jarResultBuilder.buildJarResultFileName(jarRunResult.getConfig(), projectRunResult.getProject());
+                var content = jarResultBuilder.buildJarResultContent(projectRunResult.getProject(), projectRunResult.getComparisons());
                 writeSingleFile(new File(parentDirectory, fileName), content);
             });
         });

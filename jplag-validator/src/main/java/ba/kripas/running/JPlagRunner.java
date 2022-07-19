@@ -21,12 +21,12 @@ public class JPlagRunner {
         this.projects = projects;
     }
 
-    public Summary Run() {
+    public Summary run() {
         var result = new ArrayList<JarRunResult>();
 
         for (var config : jarConfigs) {
             try {
-                result.add(RunJar(config, this.projects));
+                result.add(runJar(config, this.projects));
             } catch (MalformedURLException | IncompatibleInterfaceException | InvalidOptionsException e) {
                 e.printStackTrace();
             }
@@ -35,7 +35,8 @@ public class JPlagRunner {
         return new Summary(result);
     }
 
-    public static JarRunResult RunJar(JarConfig jarConfig, List<Project> projects) throws MalformedURLException, IncompatibleInterfaceException, InvalidOptionsException {
+    public static JarRunResult runJar(JarConfig jarConfig, List<Project> projects) throws MalformedURLException,
+            IncompatibleInterfaceException, InvalidOptionsException {
         logger.info("Now Running Jar: " + jarConfig.getJarFile().getName() + " - " + jarConfig.getConfigId());
 
         var jPlag = new JPlagWrapper(jarConfig);

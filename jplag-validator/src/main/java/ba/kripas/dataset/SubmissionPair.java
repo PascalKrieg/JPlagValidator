@@ -10,8 +10,9 @@ public class SubmissionPair {
 
     public SubmissionPair(String firstSubmission, String secondSubmission, SubmissionPairType type) {
         var comparison = firstSubmission.compareTo(secondSubmission);
-        if (comparison == 0)
+        if (comparison == 0) {
             throw new IllegalArgumentException("Tried to create submission pair between the same submission or duplicate submission name in dataset");
+        }
 
         if (comparison < 0) {
             this.firstSubmission = firstSubmission;
@@ -38,8 +39,12 @@ public class SubmissionPair {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         SubmissionPair that = (SubmissionPair) o;
         return firstSubmission.equals(that.firstSubmission) && secondSubmission.equals(that.secondSubmission);
     }

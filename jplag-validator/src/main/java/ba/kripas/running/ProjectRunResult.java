@@ -12,7 +12,7 @@ public class ProjectRunResult {
 
     private final long jplagRuntimeInMillis;
     private final long actualRuntimeInMillis;
-    private final int submissions;
+    private final int submissionCount;
 
     private final List<JPlagComparisonWrapper> comparisons;
 
@@ -32,8 +32,8 @@ public class ProjectRunResult {
         return actualRuntimeInMillis;
     }
 
-    public int getSubmissions() {
-        return submissions;
+    public int getSubmissionCount() {
+        return submissionCount;
     }
 
     public List<JPlagComparisonWrapper> getComparisons() {
@@ -46,6 +46,6 @@ public class ProjectRunResult {
         this.comparisons = jPlagResultWrapper.getComparisons();
         this.jplagRuntimeInMillis = jPlagResultWrapper.getJplagDurationInMillis();
         this.actualRuntimeInMillis = jPlagResultWrapper.getActualDurationInMillis();
-        this.submissions = jPlagResultWrapper.getNumberOfSubmissions();
+        this.submissionCount = jPlagResultWrapper.getNumberOfSubmissions();
     }
 }

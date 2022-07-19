@@ -23,14 +23,14 @@ public class App {
             var loader = new DataLoader(DATASET_PATH, JARS_PATH);
 
             logger.fine("Loading config");
-            var config = loader.LoadConfig();
+            var config = loader.loadConfig();
             logger.fine("Config loaded");
 
             logger.fine("Initializing runner");
             JPlagRunner runner = new JPlagRunner(config.getJarConfigs(), config.getProjects());
 
             logger.fine("Running...");
-            var summary = runner.Run();
+            var summary = runner.run();
             logger.fine("Finished Running");
 
             logger.fine("Writing result");

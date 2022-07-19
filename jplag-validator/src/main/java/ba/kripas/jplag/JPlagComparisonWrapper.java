@@ -10,7 +10,8 @@ public class JPlagComparisonWrapper implements Comparable {
 
     private final boolean isSuspicious;
 
-    public JPlagComparisonWrapper(String firstSubmissionName, String secondSubmissionName, float maximalSimilarity, float minimalSimilarity, float similarity, boolean suspicious) {
+    public JPlagComparisonWrapper(String firstSubmissionName, String secondSubmissionName, float maximalSimilarity,
+                                  float minimalSimilarity, float similarity, boolean suspicious) {
         this.firstSubmissionName = firstSubmissionName;
         this.secondSubmissionName = secondSubmissionName;
         this.maximalSimilarity = maximalSimilarity;
@@ -45,7 +46,9 @@ public class JPlagComparisonWrapper implements Comparable {
 
     @Override
     public int compareTo(Object o) {
-        if (this == o) return 0;
+        if (this == o) {
+            return 0;
+        }
         JPlagComparisonWrapper that = (JPlagComparisonWrapper) o;
         return Float.compare(that.similarity, similarity);
     }
